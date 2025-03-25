@@ -192,7 +192,7 @@ def generate_report(data: GenerateReportRequest):
         c.save()
         print("PDF generated successfully!")
 
-        file_path = f"{student_id}/{program_id}/{quarter}_report.pdf"
+        file_path = f"{student_id}/{program_id}/{quarter}/{timestamp1}_report.pdf"
         with open(temp_pdf.name, "rb") as file:
             supabase.storage.from_(BUCKET_NAME).upload(file_path, file, {"content-type": "application/pdf"})
             print("Uploaded to the bucket")
