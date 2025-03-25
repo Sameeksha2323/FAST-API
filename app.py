@@ -7,6 +7,10 @@ import os
 import tempfile
 # from weasyprint import HTML
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
+
+# Assign current timestamp to a variable
+timestamp1 = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -203,7 +207,7 @@ def generate_report(data: GenerateReportRequest):
         }).execute()
         print("Database updated with the report URL")
 
-        response = FileResponse(temp_pdf.name, filename=f"{student_id}_{program_id}_{quarter}_report.pdf", media_type="application/pdf")
+        response = FileResponse(temp_pdf.name, filename=f"{student_id}_{program_id}_{quarter}_{timestamp1}_report.pdf", media_type="application/pdf")
         return response
     except Exception as e:
         print("Error generating report:", str(e))
