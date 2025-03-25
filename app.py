@@ -6,6 +6,7 @@ from supabase import create_client
 import os
 import tempfile
 # from weasyprint import HTML
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -14,7 +15,13 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 BUCKET_NAME = "student-reports"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change this to specific frontend URL in production
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows GET, POST, OPTIONS, etc.
+    allow_headers=["*"],
+)
 
 class StoreGeneralRequest(BaseModel):
     student_id: int
