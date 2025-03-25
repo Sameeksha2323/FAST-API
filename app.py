@@ -19,7 +19,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 class StoreGeneralRequest(BaseModel):
     student_id: int
     program_id: int
-    employee_id: int
+    educator_employee_id: int
     quarter: str
     punctuality: str = None
     preparedness: str = None
@@ -30,7 +30,7 @@ class StoreGeneralRequest(BaseModel):
 class GenerateReportRequest(BaseModel):
     student_id: int
     program_id: int
-    employee_id: int
+    educator_employee_id: int
     quarter: str
 
 @app.get("/")
@@ -47,23 +47,23 @@ def store_general_reporting(data: StoreGeneralRequest):
             .select("*")
             .eq("student_id", data.student_id)
             .eq("program_id", data.program_id)
-            .eq("employee_id", data.employee_id)
+            .eq("educator_employee_id", data.educator_employee_id)
             .eq("quarter", data.quarter)
             .execute()
         ).data
-        update_data = {k: v for k, v in data.dict().items() if v is not None and k not in ["student_id", "program_id", "employee_id", "quarter"]}
+        update_data = {k: v for k, v in data.dict().items() if v is not None and k not in ["student_id", "program_id", "educator_employee_id", "quarter"]}
 
         if report_data:
             existing_record = report_data[0]
             for col in update_data:
                 if existing_record.get(col):
                     update_data[col] = existing_record[col] + ' ' + update_data[col]
-            supabase.table("general_reporting").update(update_data).eq("student_id", data.student_id).eq("program_id", data.program_id).eq("employee_id", data.employee_id).eq("quarter", data.quarter).execute()
+            supabase.table("general_reporting").update(update_data).eq("student_id", data.student_id).eq("program_id", data.program_id).eq("educator_employee_id", data.educator_employee_id).eq("quarter", data.quarter).execute()
         else:
             update_data.update({
                 "student_id": data.student_id,
                 "program_id": data.program_id,
-                "employee_id": data.employee_id,
+                "educator_employee_id": data.educator_employee_id,
                 "quarter": data.quarter
             })
             supabase.table("general_reporting").insert(update_data).execute()
@@ -86,11 +86,11 @@ from fastapi.responses import FileResponse
 @app.post("/generate_report")
 def generate_report(data: GenerateReportRequest):
     try:
-        student_id, program_id, employee_id, quarter = data.student_id, data.program_id, data.employee_id, data.quarter
+        student_id, program_id, educator_employee_id, quarter = data.student_id, data.program_id, data.educator_employee_id, data.quarter
 
         print("Fetching data from Supabase...")
-        general_data = supabase.table("general_reporting").select("*").eq("student_id", student_id).eq("program_id", program_id).eq("employee_id", employee_id).eq("quarter", quarter).execute().data
-        performance_data = supabase.table("performance_records").select("*").eq("student_id", student_id).eq("program_id", program_id).eq("employee_id", employee_id).eq("quarter", quarter).execute().data
+        general_data = supabase.table("general_reporting").select("*").eq("student_id", student_id).eq("program_id", program_id).eq("educator_employee_id", educator_employee_id).eq("quarter", quarter).execute().data
+        performance_data = supabase.table("performance_records").select("*").eq("student_id", student_id).eq("program_id", program_id).eq("educator_employee_id", educator_employee_id).eq("quarter", quarter).execute().data
 
         if not general_data or not performance_data:
             print("No data found")
@@ -115,7 +115,7 @@ def generate_report(data: GenerateReportRequest):
         y_position -= 30
 
         # Student Info Table
-        student_details = [["Student ID", student_id], ["Program ID", program_id], ["Employee ID", employee_id], ["Quarter", quarter]]
+        student_details = [["Student ID", student_id], ["Program ID", program_id], ["Employee ID", educator_employee_id], ["Quarter", quarter]]
         student_table = Table(student_details, colWidths=[2 * inch, 4 * inch])
         student_table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
@@ -190,7 +190,7 @@ def generate_report(data: GenerateReportRequest):
         supabase.table("reports").insert({
             "student_id": student_id,
             "program_id": program_id,
-            "employee_id": employee_id,
+            "educator_employee_id": educator_employee_id,
             "quarter": quarter,
             "url": file_url
         }).execute()
