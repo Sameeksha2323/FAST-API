@@ -104,7 +104,7 @@ def generate_report(data: GenerateReportRequest):
         y_position = 750
 
         # Add watermark logo
-        logo_path = "C:/Users/hites/Downloads/logo.jpg"  # Change this to the correct logo path
+        logo_path = os.path.join(os.path.dirname(__file__), 'static', 'logo.jpg')  # Change this to the correct logo path
         c.drawImage(logo_path, 200, 300, width=200, height=200, mask='auto')
 
         # Title
