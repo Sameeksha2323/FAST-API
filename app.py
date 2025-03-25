@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Request, StaticFiles
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from supabase import create_client
 import os
